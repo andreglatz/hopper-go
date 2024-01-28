@@ -12,10 +12,15 @@ import (
 
 func main() {
 	fx.New(
-		fx.Provide(setup.NewHTTPServer, setup.GetDBConnection, setup.GetTranslator),
-		fx.Provide(repositories.NewPostgresLinkRepository),
-		fx.Provide(usecases.NewCreateShortLinkUseCase),
-		fx.Provide(handlers.NewCreateShortLinkHandler),
+		fx.Provide(
+			setup.NewHTTPServer,
+			setup.GetDBConnection,
+			setup.GetTranslator,
+			setup.GetLogger,
+			repositories.NewPostgresLinkRepository,
+			usecases.NewCreateShortLinkUseCase,
+			handlers.NewCreateShortLinkHandler,
+		),
 		fx.Invoke(setup.RegisterRoutes),
 	).Run()
 }

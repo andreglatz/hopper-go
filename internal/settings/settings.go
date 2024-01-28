@@ -6,8 +6,14 @@ type Database struct {
 	URL string
 }
 
+type Application struct {
+	Port string
+	Env  string
+}
+
 type Settings struct {
-	Database Database
+	Database    Database
+	Application Application
 }
 
 var settings *Settings
@@ -20,6 +26,10 @@ func New() *Settings {
 	settings = &Settings{
 		Database: Database{
 			URL: os.Getenv("DATABASE_URL"),
+		},
+		Application: Application{
+			Port: os.Getenv("PORT"),
+			Env:  os.Getenv("ENV"),
 		},
 	}
 
