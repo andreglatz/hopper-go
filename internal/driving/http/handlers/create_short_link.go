@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -40,7 +41,8 @@ func (h *CreateShortLinkHandler) Handle(ctx *gin.Context) {
 
 	link, err := h.createShortLinkUseCase.Create(payload.ToUseCase())
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
 

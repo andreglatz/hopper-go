@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"github.com/andreglatz/hopper-go/internal/application/entities"
-	"github.com/andreglatz/hopper-go/internal/driven/repositories"
+	"github.com/andreglatz/hopper-go/internal/driven/db/repositories"
 )
 
 type CreateShortLinkParams struct {
@@ -18,7 +18,7 @@ type CreateLinkResponse struct {
 
 func newCreateResponse(link *entities.Link) CreateLinkResponse {
 	return CreateLinkResponse{
-		Id:       link.Id,
+		Id:       link.ID,
 		Original: link.Original,
 		Short:    link.Short,
 	}

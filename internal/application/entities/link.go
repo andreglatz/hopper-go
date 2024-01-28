@@ -1,7 +1,7 @@
 package entities
 
 type Link struct {
-	Id       uint
+	ID       uint
 	Original string
 	Short    string
 	Clicks   uint
