@@ -20,6 +20,8 @@ func main() {
 			repositories.NewPostgresLinkRepository,
 			usecases.NewCreateShortLinkUseCase,
 			handlers.NewCreateShortLinkHandler,
+			usecases.NewGetLinkUseCase,
+			handlers.NewRedirectLinkHandler,
 		),
 		fx.Invoke(setup.RegisterRoutes),
 	).Run()
