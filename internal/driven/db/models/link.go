@@ -6,9 +6,10 @@ import (
 )
 
 type Link struct {
-	ID       uint   `db:"ID"`
-	Short    string `db:"short"`
-	Original string `db:"original"`
+	ID       uint
+	Short    string
+	Original string
+	Clicks   uint
 }
 
 func NewLink(link sql.Link) *Link {
@@ -16,6 +17,7 @@ func NewLink(link sql.Link) *Link {
 		ID:       uint(link.ID),
 		Short:    link.Short,
 		Original: link.Original,
+		Clicks:   uint(link.Clicks),
 	}
 }
 
@@ -24,5 +26,6 @@ func (l *Link) ToEntity() *entities.Link {
 		ID:       l.ID,
 		Short:    l.Short,
 		Original: l.Original,
+		Clicks:   l.Clicks,
 	}
 }

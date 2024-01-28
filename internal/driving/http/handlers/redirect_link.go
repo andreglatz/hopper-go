@@ -10,11 +10,11 @@ import (
 )
 
 type RedirectLinkHandler struct {
-	getLinkUseCase usecases.GetLink
+	getLinkUseCase usecases.RedirectLink
 	logger         *zap.SugaredLogger
 }
 
-func NewRedirectLinkHandler(l *zap.SugaredLogger, u usecases.GetLink) *RedirectLinkHandler {
+func NewRedirectLinkHandler(l *zap.SugaredLogger, u usecases.RedirectLink) *RedirectLinkHandler {
 	return &RedirectLinkHandler{
 		getLinkUseCase: u,
 		logger:         l,
@@ -33,5 +33,7 @@ func (h *RedirectLinkHandler) Handle(ctx *gin.Context) {
 		return
 	}
 
+	ctx.Header("Location", link)
+	ctx.Header("Cache-Control", "no-cache")
 	ctx.Redirect(http.StatusMovedPermanently, link)
 }

@@ -14,3 +14,7 @@ func NewLink(original string, short string) Link {
 		Clicks:   0,
 	}
 }
+
+func (l *Link) AddClick() {
+	l.Clicks++
+}

@@ -10,4 +10,5 @@ type Link struct {
 	ID       int32
 	Short    string
 	Original string
+	Clicks   int32
 }

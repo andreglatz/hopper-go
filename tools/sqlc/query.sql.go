@@ -15,7 +15,7 @@ INSERT INTO links (
 ) VALUES (
   $1, $2
 )
-RETURNING id, short, original
+RETURNING id, short, original, clicks
 `
 
 type CreateLinkParams struct {
@@ -26,18 +26,53 @@ type CreateLinkParams struct {
 func (q *Queries) CreateLink(ctx context.Context, arg CreateLinkParams) (Link, error) {
 	row := q.db.QueryRow(ctx, createLink, arg.Short, arg.Original)
 	var i Link
-	err := row.Scan(&i.ID, &i.Short, &i.Original)
+	err := row.Scan(
+		&i.ID,
+		&i.Short,
+		&i.Original,
+		&i.Clicks,
+	)
 	return i, err
 }
 
 const getLinkByShort = `-- name: GetLinkByShort :one
-SELECT id, short, original FROM links
+SELECT id, short, original, clicks FROM links
 WHERE short = $1 LIMIT 1
 `
 
 func (q *Queries) GetLinkByShort(ctx context.Context, short string) (Link, error) {
 	row := q.db.QueryRow(ctx, getLinkByShort, short)
 	var i Link
-	err := row.Scan(&i.ID, &i.Short, &i.Original)
+	err := row.Scan(
+		&i.ID,
+		&i.Short,
+		&i.Original,
+		&i.Clicks,
+	)
 	return i, err
+}
+
+const updateLink = `-- name: UpdateLink :exec
+UPDATE links SET
+  short = $1,
+  original = $2,
+  clicks = $3
+WHERE id = $4
+`
+
+type UpdateLinkParams struct {
+	Short    string
+	Original string
+	Clicks   int32
+	ID       int32
+}
+
+func (q *Queries) UpdateLink(ctx context.Context, arg UpdateLinkParams) error {
+	_, err := q.db.Exec(ctx, updateLink,
+		arg.Short,
+		arg.Original,
+		arg.Clicks,
+		arg.ID,
+	)
+	return err
 }

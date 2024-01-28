@@ -10,7 +10,8 @@ import (
 )
 
 type LinkRepository interface {
-	Save(*entities.Link) error
+	Create(*entities.Link) error
+	Update(*entities.Link) error
 	GetByShort(string) (*entities.Link, error)
 }
 
@@ -26,13 +27,29 @@ func NewPostgresLinkRepository(conn *pgx.Conn) LinkRepository {
 	}
 }
 
-func (r *PostgresLinkRepository) Save(link *entities.Link) error {
+func (r *PostgresLinkRepository) Create(link *entities.Link) error {
 	result, err := r.db.CreateLink(context.Background(), sql.CreateLinkParams{Short: link.Short, Original: link.Original})
 	if err != nil {
 		return err
 	}
 
 	link.ID = uint(result.ID)
+
+	return nil
+}
+
+func (r *PostgresLinkRepository) Update(link *entities.Link) error {
+	params := sql.UpdateLinkParams{
+		ID:       int32(link.ID),
+		Short:    link.Short,
+		Original: link.Original,
+		Clicks:   int32(link.Clicks),
+	}
+
+	err := r.db.UpdateLink(context.Background(), params)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

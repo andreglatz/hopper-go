@@ -41,7 +41,7 @@ func NewCreateShortLinkUseCase(r repositories.LinkRepository) CreteShortLink {
 func (c *createShortLinkUseCase) Create(params CreateShortLinkParams) (CreateLinkResponse, error) {
 	link := entities.NewLink(params.Original, params.Short)
 
-	if err := c.linkRepository.Save(&link); err != nil {
+	if err := c.linkRepository.Create(&link); err != nil {
 		return CreateLinkResponse{}, err
 	}
 

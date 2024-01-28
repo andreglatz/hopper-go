@@ -9,3 +9,10 @@ INSERT INTO links (
   $1, $2
 )
 RETURNING *;
+
+-- name: UpdateLink :exec
+UPDATE links SET
+  short = $1,
+  original = $2,
+  clicks = $3
+WHERE id = $4;
