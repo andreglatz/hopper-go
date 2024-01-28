@@ -9,10 +9,18 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+type GetLinksParams struct {
+	Offset   int32
+	Limit    int32
+	Short    string
+	Original string
+}
+
 type LinkRepository interface {
 	Create(*entities.Link) error
 	Update(*entities.Link) error
 	GetByShort(string) (*entities.Link, error)
+	GetLinks(GetLinksParams) ([]*entities.Link, uint, error)
 }
 
 type PostgresLinkRepository struct {
@@ -61,4 +69,44 @@ func (r *PostgresLinkRepository) GetByShort(short string) (*entities.Link, error
 	}
 
 	return models.NewLink(link).ToEntity(), nil
+}
+
+func (r *PostgresLinkRepository) GetLinks(params GetLinksParams) ([]*entities.Link, uint, error) {
+	dbParams := sql.GetLinksParams{
+		Limit:    params.Limit,
+		Offset:   params.Offset,
+		Short:    params.Short,
+		Original: params.Original,
+	}
+
+	links, err := r.db.GetLinks(context.Background(), dbParams)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var entitiesLinks []*entities.Link
+	for _, link := range links {
+		entitiesLinks = append(entitiesLinks, models.NewLink(link).ToEntity())
+	}
+
+	count, err := r.count(params)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return entitiesLinks, count, nil
+}
+
+func (r *PostgresLinkRepository) count(params GetLinksParams) (uint, error) {
+	dbParams := sql.GetLinksCountParams{
+		Short:    params.Short,
+		Original: params.Original,
+	}
+
+	count, err := r.db.GetLinksCount(context.Background(), dbParams)
+	if err != nil {
+		return 0, err
+	}
+
+	return uint(count), nil
 }

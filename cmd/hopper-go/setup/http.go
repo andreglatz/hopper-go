@@ -13,11 +13,13 @@ type RegisterRoutesParams struct {
 
 	CreateShortLinkHandler *handlers.CreateShortLinkHandler
 	RedirectLinkHandler    *handlers.RedirectLinkHandler
+	GetLinksHandler        *handlers.GetLinksHandler
 }
 
 func RegisterRoutes(r *gin.Engine, handlers RegisterRoutesParams) {
 	r.POST("/links", handlers.CreateShortLinkHandler.Handle)
 	r.GET("/:short", handlers.RedirectLinkHandler.Handle)
+	r.GET("/", handlers.GetLinksHandler.Handle)
 }
 
 func NewHTTPServer(lc fx.Lifecycle) *gin.Engine {

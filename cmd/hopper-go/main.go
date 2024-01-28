@@ -19,9 +19,11 @@ func main() {
 			setup.GetLogger,
 			repositories.NewPostgresLinkRepository,
 			usecases.NewCreateShortLinkUseCase,
-			handlers.NewCreateShortLinkHandler,
 			usecases.NewRedirectLinkUseCase,
+			usecases.NewGetLinksUseCase,
+			handlers.NewCreateShortLinkHandler,
 			handlers.NewRedirectLinkHandler,
+			handlers.NewGetLinksHandler,
 		),
 		fx.Invoke(setup.RegisterRoutes),
 	).Run()

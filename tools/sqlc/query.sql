@@ -16,3 +16,18 @@ UPDATE links SET
   original = $2,
   clicks = $3
 WHERE id = $4;
+
+-- name: GetLinks :many
+SELECT * FROM links
+WHERE
+  (CASE WHEN @short::text IS NOT NULL THEN short LIKE '%' || @short::text || '%' ELSE TRUE END)
+  AND (CASE WHEN @original::text IS NOT NULL THEN original LIKE '%' || @original::text || '%' ELSE TRUE END)
+LIMIT sqlc.arg('limit')
+OFFSET sqlc.arg('offset');
+
+
+-- name: GetLinksCount :one
+SELECT COUNT(*) FROM links
+WHERE
+  (CASE WHEN @short::text IS NOT NULL THEN short LIKE '%' || @short::text || '%' ELSE TRUE END)
+  AND (CASE WHEN @original::text IS NOT NULL THEN original LIKE '%' || @original::text || '%' ELSE TRUE END);

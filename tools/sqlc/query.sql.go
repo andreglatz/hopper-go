@@ -52,6 +52,71 @@ func (q *Queries) GetLinkByShort(ctx context.Context, short string) (Link, error
 	return i, err
 }
 
+const getLinks = `-- name: GetLinks :many
+SELECT id, short, original, clicks FROM links
+WHERE
+  (CASE WHEN $1::text IS NOT NULL THEN short LIKE '%' || $1::text || '%' ELSE TRUE END)
+  AND (CASE WHEN $2::text IS NOT NULL THEN original LIKE '%' || $2::text || '%' ELSE TRUE END)
+LIMIT $4
+OFFSET $3
+`
+
+type GetLinksParams struct {
+	Short    string
+	Original string
+	Offset   int32
+	Limit    int32
+}
+
+func (q *Queries) GetLinks(ctx context.Context, arg GetLinksParams) ([]Link, error) {
+	rows, err := q.db.Query(ctx, getLinks,
+		arg.Short,
+		arg.Original,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Link
+	for rows.Next() {
+		var i Link
+		if err := rows.Scan(
+			&i.ID,
+			&i.Short,
+			&i.Original,
+			&i.Clicks,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getLinksCount = `-- name: GetLinksCount :one
+SELECT COUNT(*) FROM links
+WHERE
+  (CASE WHEN $1::text IS NOT NULL THEN short LIKE '%' || $1::text || '%' ELSE TRUE END)
+  AND (CASE WHEN $2::text IS NOT NULL THEN original LIKE '%' || $2::text || '%' ELSE TRUE END)
+`
+
+type GetLinksCountParams struct {
+	Short    string
+	Original string
+}
+
+func (q *Queries) GetLinksCount(ctx context.Context, arg GetLinksCountParams) (int64, error) {
+	row := q.db.QueryRow(ctx, getLinksCount, arg.Short, arg.Original)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const updateLink = `-- name: UpdateLink :exec
 UPDATE links SET
   short = $1,
